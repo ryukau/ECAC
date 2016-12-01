@@ -145,6 +145,8 @@ class ToneStack {
     this.parent = parent
     this.context = audioContext
     this.masterGain = null
+    this._volume = 1
+    this.denomMasterGain = this.length
     this.length = NUM_CHORD
     this.uniform = true
     this.tones
@@ -155,7 +157,6 @@ class ToneStack {
 
   initialize() {
     this.masterGain = this.context.createGain()
-    this.masterGain.gain.value = 1 / this.length
     this.masterGain.connect(this.parent)
 
     this.tones = []
@@ -166,10 +167,12 @@ class ToneStack {
       var offset = this.uniform ? 0 : 65536
       this.automata.push(new ElementaryCA(INITIAL_HARMONICS, 30, offset * i))
     }
+    this.normalizeVolume()
   }
 
   set volume(value) {
-    this.masterGain.gain.value = value / this.length
+    this._volume = value
+    this.masterGain.gain.value = this._volume / this.denomMasterGain
   }
 
   set harmoInterval(value) {
@@ -195,10 +198,20 @@ class ToneStack {
 
   setVolume(value, index) {
     this.tones[index].volume = value
+    this.normalizeVolume()
   }
 
   getVolume(index) {
     return this.tones[index].masterGain.gain.value
+  }
+
+  normalizeVolume() {
+    var sum = 0
+    for (var i = 0; i < this.tones.length; ++i) {
+      sum += this.tones[i].masterGain.gain.value
+    }
+    this.denomMasterGain = sum
+    this.masterGain.gain.value = this._volume / sum
   }
 
   setPitch(value, index) {
@@ -408,10 +421,10 @@ function random(type) {
 }
 
 function setPitch() {
-    toneStack.setPitch(pitch.value + pitch00.value, 0)
-    toneStack.setPitch(pitch.value + pitch00.value + pitch01.value, 3)
-    toneStack.setPitch(pitch.value + pitch1.value, 1)
-    toneStack.setPitch(pitch.value + pitch2.value, 2)
+  toneStack.setPitch(pitch.value + pitch00.value, 0)
+  toneStack.setPitch(pitch.value + pitch00.value + pitch01.value, 3)
+  toneStack.setPitch(pitch.value + pitch1.value, 1)
+  toneStack.setPitch(pitch.value + pitch2.value, 2)
 
   toneStack.setVolume(volume01.value, 3)
   toneStack.setVolume(volume1.value, 1)
