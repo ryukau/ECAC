@@ -408,10 +408,10 @@ function random(type) {
 }
 
 function setPitch() {
-  toneStack.setPitch(pitch00.value, 0)
-  toneStack.setPitch(pitch00.value + pitch01.value, 3)
-  toneStack.setPitch(pitch1.value, 1)
-  toneStack.setPitch(pitch2.value, 2)
+    toneStack.setPitch(pitch.value + pitch00.value, 0)
+    toneStack.setPitch(pitch.value + pitch00.value + pitch01.value, 3)
+    toneStack.setPitch(pitch.value + pitch1.value, 1)
+    toneStack.setPitch(pitch.value + pitch2.value, 2)
 
   toneStack.setVolume(volume01.value, 3)
   toneStack.setVolume(volume1.value, 1)
@@ -462,28 +462,35 @@ var smooth = new NumberInput(divControls.element, "Smooth",
   2, 0, 1000, 1, () => { })
 var duration = new NumberInput(divControls.element, "Duration",
   INITIAL_DURATION, 10, 400, 1, () => clock.delay = duration.value)
+var pitch = new NumberInput(divControls.element, "Pitch",
+  0, -60, 60, 1, () => {
+    toneStack.setPitch(pitch.value + pitch00.value, 0)
+    toneStack.setPitch(pitch.value + pitch00.value + pitch01.value, 3)
+    toneStack.setPitch(pitch.value + pitch1.value, 1)
+    toneStack.setPitch(pitch.value + pitch2.value, 2)
+  })
 var pitch00 = new NumberInput(divControls.element, "Pitch0",
   INITIAL_PITCH, -60, 60, 1, () => {
-    toneStack.setPitch(pitch00.value, 0)
-    toneStack.setPitch(pitch00.value + pitch01.value, 3)
+    toneStack.setPitch(pitch.value + pitch00.value, 0)
+    toneStack.setPitch(pitch.value + pitch00.value + pitch01.value, 3)
   })
 var volume01 = new NumberInput(divControls.element, "Volume0+",
   0.3, 0, 2, 0.01, () => toneStack.setVolume(volume01.value, 3))
 var pitch01 = new NumberInput(divControls.element, "Pitch0+",
   12, -60, 60, 1, () => {
-    toneStack.setPitch(pitch00.value + pitch01.value, 3)
+    toneStack.setPitch(pitch.value + pitch00.value + pitch01.value, 3)
   })
 var volume1 = new NumberInput(divControls.element, "Volume1",
   1, 0, 2, 0.01, () => toneStack.setVolume(volume1.value, 1))
 var pitch1 = new NumberInput(divControls.element, "Pitch1",
   INITIAL_PITCH + 7, -60, 60, 1, () => {
-    toneStack.setPitch(pitch1.value, 1)
+    toneStack.setPitch(pitch.value + pitch1.value, 1)
   })
 var volume2 = new NumberInput(divControls.element, "Volume2",
   1, 0, 2, 0.01, () => toneStack.setVolume(volume2.value, 2))
 var pitch2 = new NumberInput(divControls.element, "Pitch2",
   INITIAL_PITCH + 10, -60, 60, 1, () => {
-    toneStack.setPitch(pitch2.value, 2)
+    toneStack.setPitch(pitch.value + pitch2.value, 2)
   })
 var harmonics = new NumberInput(divControls.element, "Harmonics",
   INITIAL_HARMONICS, 4, MAX_HARMONICS, 1, () => {
