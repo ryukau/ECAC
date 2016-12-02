@@ -1,5 +1,6 @@
 const TWO_PI = 2 * Math.PI
 const SYNTH_NAME = "ECA Chord"
+const INITIAL_SMOOTH = 2
 const INITIAL_HARMONICS = 16
 const MAX_HARMONICS = 64
 const INITIAL_HARMONICS_INTERVAL = 1
@@ -42,6 +43,7 @@ class Tone {
     this.harmonicGains
     this.controlGains
     this.masterGain
+    this.smooth = INITIAL_SMOOTH
     this._harmoInterval = INITIAL_HARMONICS_INTERVAL
     this._harmoGain = INITIAL_HARMONICS_GAIN
 
@@ -112,7 +114,7 @@ class Tone {
   }
 
   set muteHarmonics(mute) {
-    var endTime = this.context.currentTime + smooth.value / 1000
+    var endTime = this.context.currentTime + this.smooth / 1000
     for (var i = 0; i < mute.length; ++i) {
       var value = mute[i] ? 1 : 0
       this.controlGains[i].gain.linearRampToValueAtTime(value, endTime)
@@ -127,7 +129,7 @@ class Tone {
   }
 
   stop() {
-    var endTime = this.context.currentTime + Math.max(smooth.value / 1000, 0.01)
+    var endTime = this.context.currentTime + Math.max(this.smooth / 1000, 0.01)
     for (var i = 0; i < MAX_HARMONICS; ++i) {
       this.controlGains[i].gain.linearRampToValueAtTime(0, endTime)
     }
@@ -173,6 +175,10 @@ class ToneStack {
   set volume(value) {
     this._volume = value
     this.masterGain.gain.value = this._volume / this.denomMasterGain
+  }
+
+  set smooth(value) {
+    this.tones.forEach((element) => element.smooth = value)
   }
 
   set harmoInterval(value) {
@@ -472,7 +478,7 @@ var divControls = new Div(divMain.element, "synthControls")
 var volume = new NumberInput(divControls.element, "Volume",
   1, 0, 2, 0.01, () => toneStack.volume = volume.value)
 var smooth = new NumberInput(divControls.element, "Smooth",
-  2, 0, 1000, 1, () => { })
+  INITIAL_SMOOTH, 0, 1000, 1, () => toneStack.smooth = smooth.value)
 var duration = new NumberInput(divControls.element, "Duration",
   INITIAL_DURATION, 10, 400, 1, () => clock.delay = duration.value)
 var pitch = new NumberInput(divControls.element, "Pitch",
